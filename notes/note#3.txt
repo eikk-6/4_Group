@@ -1,0 +1,255 @@
+예제 3-2 실습
+
+#include <iostream>
+using namespace std;
+
+class Rectangle {
+public:
+	int width;
+	int height;
+	double getArea();
+};
+
+double Rectangle::getArea()
+{
+	return width * height;
+}
+
+int main() 
+{
+	Rectangle rect;
+	rect.width = 3;
+	rect.height = 5;
+	cout << "사각형의 면적은 " << rect.getArea() << endl;
+}
+
+실습을 해보면서 클래스에 대해 이해하기 쉬웠고 클래스 안에서 
+맴버에 대한 접근 권한을 선언하는 것이 신기했다. 클래스 내부에 함수를 선언하고 밖에서 
+맴버함수를 구현 해줘야 한다는 것과 실습을 하였을 때 
+구현을 제대로 했는대도 실행 오류가 발생 했었는데 메인 함수의 위치를 바꿔주니
+실행되는 것을 보고 c++은 실행되는 함수의 순서도 중요하다는 것을 알게 되었다.
+
+--------------------------------------------------------------------------------------------------
+
+위임생성자를 쓰는 이유
+
+1. 코드를 간소화하여 실행 속도를 높혀준다.
+2. 초기값을 설정 해두어서 값을 설정해주지 않아도 컴파일오류가 발생하지 않는다.
+
+
+--------------------------------------------------------------------------------------------------
+
+예제 3-6
+
+#include <iostream>
+using namespace std;
+
+class Rectangle {
+public:
+	int width;
+	int height;
+	Rectangle();
+	Rectangle(int a);
+	Rectangle(int a, int b);
+	bool isSquare();
+};
+
+Rectangle::Rectangle()
+{
+	width = height = 1;
+}
+
+Rectangle:: Rectangle(int a)
+{
+	width = height = a;
+}
+
+Rectangle::Rectangle(int a, int b)
+{
+	width = a;
+	height = b;
+}
+
+bool Rectangle::isSquare() 
+{
+	if (width == height)
+		return true;
+	else
+		return false;
+}
+
+
+int main() {
+	Rectangle rect1;
+	Rectangle rect2(3, 5);
+	Rectangle rect3(3);
+	if (rect1.isSquare()) cout << "rect1은 정사각형이다." << endl;
+	if (rect2.isSquare()) cout << "rect2는 정사각형이다." << endl;
+	if (rect3.isSquare()) cout << "rect3는 정사각형이다." << endl;
+}
+
+
+여러개의 Rectangle 변수를 봤을 때 생성자의 갯수는 3개이고 한개는 변수가 없는 함수 
+다른 한개는 변수 한개, 나머지는 변수 2개인 생성자를 만들어야 한다. 변수가 없는 함수에는
+width와 height의 값을 1로 만들고, 변수가 한개인 생성자는 width와 height의 값을 같게 만들기
+위해 "width = height = a"로 적은 뒤 마지막 생성자는 각각의 값을 width와 height에 들어가게 하면 된다.
+그리고 isSquare 라는 맴버 함수를 생성하여 width의 값과 height의 값이 같을때 true를 return하고
+아닐때는 false를 return 시키면 코드가 완성된다.
+
+--------------------------------------------------------------------------------------------------
+
+예제 3-8
+
+실행순서는 전역 객체가 먼저 생성되고 그다음 메인 안에 있는 지역 객체 마지막으로 f 함수 안에 있는 
+지역 객체가 생성된 뒤 f함수 > 메인 지역 객체 > 전역 객체 순서대로 소멸된다.
+
+
+---------------------------------------------------------------------------------------------------
+
+
+예제 3-3처럼 p155의 11번 나누기
+
+Box.h
+
+#pragma once
+class Box {
+	int width, height;
+	char fill;
+public:
+	Box(int w, int h) { setSize(w, h); fill = '*'; }
+	void setFill(char f) { fill = f; }
+	void setSize(int w, int h) { width = w; height = h; }
+	void draw();
+};
+------------------------------------------------
+Box.cpp
+
+#include <iostream>
+using namespace std;
+
+#include "Box.h"
+
+void Box::draw() 
+{
+	for (int n = 0; n < height; n++) 
+	{
+		for (int m = 0; m < width; m++) cout << fill;
+		cout << endl;
+	}
+}
+-------------------------------------------------
+main.cpp
+
+#include <iostream>
+using namespace std;
+
+#include "Box.h"
+
+int main() 
+{
+	Box b(10, 2);
+	b.draw();
+	cout << endl;
+	b.setSize(7, 4);
+	b.setFill('^');
+	b.draw();
+}
+
+
+클래스를 헤더 파일과 cpp 파일로 분리하여 작성했을 때 단기적으로 봤을때는 불편한 것 같지만
+장기적으로 봤을때 정리가 잘 되어있어 나중에 클래스를 재활용 할 수도 있고 내가 작성한 코드
+가 어디에 적혀있는지 바로 파악할 수 있을 것 같았다.
+
+-----------------------------------------------------------------------------------------
+
+main.cpp
+
+#include <iostream>
+using namespace std;
+
+#include "Calculator.h"
+
+int main() {
+	Calculator calc; // calc 객체 생성
+	calc.run(); // 계산기 시작
+}
+
+-----------------------------------------------------------------------------------------
+
+Box.h
+
+#pragma once
+class Box {
+	int width, height;
+	char fill;
+public:
+	Box(int w, int h) 
+	{ 
+		setSize(w, h); fill = '*'; 
+	}
+	void setFill(char f) 
+	{ 
+		fill = f; 
+	}
+	void setSize(int w, int h) 
+	{ 
+		width = w; height = h; 
+	}
+	void draw();
+};
+
+-----------------------------------------------------------------------------------------
+
+ADDER.h
+
+#pragma once
+#ifndef ADDER_H
+#define ADDER_H
+class Adder { // 덧셈 모듈 클래스
+	int op1, op2;
+public:
+	Adder(int a, int b);
+	int process();
+};
+
+#endif // !ADDER_H
+
+
+
+
+#pragma once
+#ifndef CALCULATOR_H
+#define CALCULATOR_H
+
+
+class Calculator { // 계산기 클래스
+public:
+	void run();
+};
+
+#endif // !CALCULATOR_H
+
+
+-----------------------------------------------------------------------------------------
+
+Calculator.cpp
+
+#include <iostream>
+using namespace std;
+
+#include "calculator.h"
+#include "adder.h"
+
+void Calculator::run() {
+	cout << "두 개의 수를 입력하세요>>";
+	int a, b;
+	cin >> a >> b; // 정수 두 개 입력
+	Adder adder(a, b); // 덧셈기 생성
+	cout << adder.process(); // 덧셈 계산
+}
+
+이 문제는 하나의 코드를 cpp 파일과 헤더 파일로 나누는 문제이다. 이때 두개의 헤더파일이 충돌하는것을 방지하기 
+위해 #ifndef와 #define을 혼합해 사용하면 헤더 파일이 중복 컴파일되는 현상을 피할수 있다. 만약 키워드가 정의 
+되어 있다면 컴파일러가 #endif 가 있는 블록 까지 코드를 무시하고 만약 해당 키워드가 정의 되어 있지 않다면 
+정상적으로 코드가 실행된다. 따라서 두가지 이상의 헤더파일이 있는 경우 #ifndef와 #define를 혼합하여 사용하면
+코드가 꼬이는걸 사전에 방지할수 있다.
